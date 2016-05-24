@@ -16,7 +16,9 @@ init(State) ->
         {bare, true},                 % The task can be run by the user, always true
         {deps, ?DEPS},                % The list of dependencies
         {example, "rebar3 ehcu"}, % How to use the plugin
-        {opts, []},                   % list of options understood by the plugin
+        {opts, [                 % list of options understood by the plugin
+            {deps, $d, "deps", undefined, "also run against dependencies"}
+        ]},
         {short_desc, "Hot code upgrade plugin for convinience"},
         {desc, "Hot code upgrade plugin for convinience"}
     ]),
@@ -25,7 +27,11 @@ init(State) ->
 
 -spec do(rebar_state:t()) -> {ok, rebar_state:t()} | {error, string()}.
 do(State) ->
-    lists:foreach(fun check_todo_app/1, rebar_state:project_apps(State)),
+    Apps = case discovery_type(State) of
+               project -> rebar_state:project_apps(State);
+               deps -> rebar_state:project_apps(State) ++ lists:usort(rebar_state:all_deps(State))
+           end,
+    lists:foreach(fun check_todo_app/1, Apps),
     {ok, State}.
 
 -spec format_error(any()) -> iolist().
@@ -66,3 +72,10 @@ display_todos(App, FileMatches) ->
          [io:format("\t  ~s~n", [TODO]) || TODO <- TODOs]
      end || {Mod, TODOs} <- FileMatches],
     ok.
+
+discovery_type(State) ->
+    {Args, _} = rebar_state:command_parsed_args(State),
+    case proplists:get_value(deps, Args) of
+        undefined -> project;
+        _ -> deps
+    end.
