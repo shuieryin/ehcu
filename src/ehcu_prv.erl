@@ -27,6 +27,7 @@ init(State) ->
 
 -spec do(rebar_state:t()) -> {ok, rebar_state:t()} | {error, string()}.
 do(State) ->
+    io:format("State:~p~n", [State]),
     Apps = case discovery_type(State) of
                project -> rebar_state:project_apps(State);
                deps -> rebar_state:project_apps(State) ++ lists:usort(rebar_state:all_deps(State))
