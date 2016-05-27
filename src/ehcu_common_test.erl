@@ -1,6 +1,10 @@
 -module(ehcu_common_test).
 
--export([init/1, do/1, format_error/1]).
+-export([
+    init/1,
+    do/1,
+    format_error/1
+]).
 
 -include("ehcu.hrl").
 
@@ -29,18 +33,21 @@ init(State) ->
 -spec do(rebar_state:t()) -> {ok, rebar_state:t()} | {error, string()}.
 do(State) ->
     #ehcu_state{
-        rebar_config = RebarConfig
+        rebar_config = RebarConfig,
+        plugin_path = PluginPath
     } = ehcu:ehcu_state(State),
 
     case lists:keyfind(cover_enabled, 1, RebarConfig) of
         {cover_enabled, true} ->
-            do_nothing;
+            RawAnalysis = os:cmd(filename:append(PluginPath, "/priv/test_coverage.sh")),
+            Analysis = re:replace(RawAnalysis, "\n", "~n", [global, {return, list}]),
+            io:format(Analysis);
         _CoverDisabled ->
             io:format("===> Please define \"{cover_enabled, true}\" in rebar.config~n")
     end,
 
-
     io:format("===> Common test done.~n"),
+
     {ok, State}.
 
 -spec format_error(any()) -> iolist().

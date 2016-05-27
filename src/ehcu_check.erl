@@ -1,6 +1,10 @@
 -module(ehcu_check).
 
--export([init/1, do/1, format_error/1]).
+-export([
+    init/1,
+    do/1,
+    format_error/1
+]).
 
 -include("ehcu.hrl").
 
@@ -28,22 +32,13 @@ init(State) ->
 
 -spec do(rebar_state:t()) -> {ok, rebar_state:t()} | {error, string()}.
 do(State) ->
-    EhcuState = ehcu:ehcu_state(State),
-    check(EhcuState),
+    #ehcu_state{
+        app_name = AppName,
+        app_vsn = Vsn,
+        plugin_path = PluginPath,
+        project_path = ProjectPath
+    } = ehcu:ehcu_state(State),
 
-    {ok, State}.
-
--spec format_error(any()) -> iolist().
-format_error(Reason) ->
-    io_lib:format("~p", [Reason]).
-
-%==================================================================
-check(#ehcu_state{
-    app_name = AppName,
-    app_vsn = Vsn,
-    plugin_path = PluginPath,
-    project_path = ProjectPath
-}) ->
     OverviewEdocPath = filename:append(ProjectPath, "/config/overview.edoc"),
 
     case filelib:is_file(OverviewEdocPath) of
@@ -52,4 +47,12 @@ check(#ehcu_state{
             io:format("===> Ovewview generated successfully~n");
         false ->
             io:format("===> config/overview.edoc does not exist, skip genereating overview.~n")
-    end.
+    end,
+
+    {ok, State}.
+
+-spec format_error(any()) -> iolist().
+format_error(Reason) ->
+    io_lib:format("~p", [Reason]).
+
+%==================================================================

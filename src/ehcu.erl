@@ -2,7 +2,8 @@
 
 -export([
     init/1,
-    ehcu_state/1
+    ehcu_state/1,
+    retrieve_n_break/2
 ]).
 
 -include("ehcu.hrl").
