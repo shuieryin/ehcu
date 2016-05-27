@@ -17,5 +17,7 @@
     plugin_path :: file:filename(),
     project_path :: file:filename(),
     src_config :: tuple(),
-    src_file_path :: file:filename()
+    src_file_path :: file:filename(),
+    rebar_config_path :: file:filename(),
+    rebar_config :: [tuple()]
 }).

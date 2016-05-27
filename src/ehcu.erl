@@ -1,11 +1,40 @@
 -module(ehcu).
 
--export([init/1]).
+-export([
+    init/1,
+    ehcu_state/1
+]).
 
 -include("ehcu.hrl").
 
 -spec init(rebar_state:t()) -> {ok, rebar_state:t()}.
 init(State) ->
+    PluginInfo = lists:keyfind(atom_to_binary(?PLUGIN_NAME, utf8), 2, rebar_state:all_plugin_deps(State)),
+    PluginPath = rebar_app_info:dir(PluginInfo),
+    {ok, FileList} = file:list_dir(filename:append(PluginPath, "src")),
+
+    FinalState = lists:foldl(
+        fun(FileName, AccState) ->
+            case re:run(FileName, <<"^(ehcu_.*)\.erl">>, [global, {capture, all_but_first, list}]) of
+                {match, [[ModuleNameStr]]} ->
+                    ModuleName = list_to_atom(ModuleNameStr),
+                    {ok, UpdatedAccState} = ModuleName:init(AccState),
+                    UpdatedAccState;
+                nomatch ->
+                    AccState
+            end
+        end, State, FileList),
+
+    {ok, FinalState}.
+
+%%--------------------------------------------------------------------
+%% @doc
+%% Generate ehcu state.
+%%
+%% @end
+%%--------------------------------------------------------------------
+-spec ehcu_state(rebar_state:t()) -> #ehcu_state{}.
+ehcu_state(State) ->
     ProjectPath = rebar_state:dir(State),
     ProjectSrcPath = filename:append(ProjectPath, "src"),
 
@@ -26,22 +55,19 @@ init(State) ->
     {vsn, Vsn} = lists:keyfind(vsn, 1, ConfigList),
     PluginInfo = lists:keyfind(atom_to_binary(?PLUGIN_NAME, utf8), 2, rebar_state:all_plugin_deps(State)),
 
-    EhcuState = #ehcu_state{
+    RebarConfigPath = filename:append(ProjectPath, "rebar.config"),
+    {ok, RebarConfig} = file:consult(RebarConfigPath),
+
+    #ehcu_state{
         app_name = atom_to_list(RawAppName),
         app_vsn = Vsn,
         plugin_path = rebar_app_info:dir(PluginInfo),
         project_path = ProjectPath,
         src_config = SrcConfig,
-        src_file_path = SrcFilePath
-    },
-
-    Dict = dict:new(),
-
-    UpdatedState = rebar_state:opts(State, dict:append(?STATE_NAME, EhcuState, Dict)),
-
-    {ok, State1} = ehcu_default:init(UpdatedState),
-    {ok, State2} = ehcu_check:init(State1),
-    {ok, State2}.
+        src_file_path = SrcFilePath,
+        rebar_config_path = RebarConfigPath,
+        rebar_config = RebarConfig
+    }.
 
 %%--------------------------------------------------------------------
 %% @doc

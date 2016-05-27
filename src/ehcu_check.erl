@@ -28,9 +28,7 @@ init(State) ->
 
 -spec do(rebar_state:t()) -> {ok, rebar_state:t()} | {error, string()}.
 do(State) ->
-    Dict = rebar_state:opts(State),
-    EhcuState = dict:fetch(?STATE_NAME, Dict),
-    io:format("EhcuState233:~p~n", [EhcuState]),
+    EhcuState = ehcu:ehcu_state(State),
     check(EhcuState),
 
     {ok, State}.
@@ -53,5 +51,5 @@ check(#ehcu_state{
             os:cmd(filename:append(PluginPath, "/priv/gen_edoc.sh " ++ AppName ++ " " ++ Vsn)),
             io:format("===> Ovewview generated successfully~n");
         false ->
-            io:format("===> config/overview.edoc does not exist, skip genereating overview.")
+            io:format("===> config/overview.edoc does not exist, skip genereating overview.~n")
     end.
