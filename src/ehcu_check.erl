@@ -24,8 +24,8 @@ init(State) ->
         {example, "rebar3 ck"}, % How to use the plugin
         {hooks, {[], [edoc]}}, % execute rebar command afterwards
         {opts, []},
-        {short_desc, "run dialyzer and edoc"},
-        {desc, "run dialyzer and edoc with overview.edoc if exists"}
+        {short_desc, "run dialyzer and edoc with overview.edoc if exists"},
+        {desc, "Run dialyzer and edoc with overview.edoc if exists"}
     ]),
     {ok, rebar_state:add_provider(State, Provider)}.
 
@@ -44,7 +44,7 @@ do(State) ->
     case filelib:is_file(OverviewEdocPath) of
         true ->
             os:cmd(filename:append(PluginPath, "/priv/gen_edoc.sh " ++ AppName ++ " " ++ Vsn)),
-            io:format("===> Ovewview generated successfully~n");
+            io:format("===> Edoc overview generated successfully~n");
         false ->
             io:format("===> config/overview.edoc does not exist, skip genereating overview.~n")
     end,

@@ -3,7 +3,8 @@
 -export([
     init/1,
     ehcu_state/1,
-    retrieve_n_break/2
+    retrieve_n_break/2,
+    format_os_ouput/1
 ]).
 
 -include("ehcu.hrl").
@@ -89,3 +90,14 @@ retrieve_n_break(Func, [H | T]) ->
             retrieve_n_break(Func, T)
     end;
 retrieve_n_break(Func, []) when is_function(Func, 1) -> undefined.
+
+
+%%--------------------------------------------------------------------
+%% @doc
+%% Format output from os:cmd/1.
+%%
+%% @end
+%%--------------------------------------------------------------------
+-spec format_os_ouput(string()) -> string().
+format_os_ouput(RawOutput) ->
+    re:replace(RawOutput, "\n", "~n", [global, {return, list}]).

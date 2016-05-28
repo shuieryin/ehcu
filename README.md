@@ -1,7 +1,7 @@
 ehcu
 =====
 
-Hot code upgrade plugin for convinience
+Hot code upgrade plugin for my convenience
 
 Build
 -----
@@ -14,13 +14,12 @@ Use
 Add the plugin to your rebar config:
 
     {plugins, [
-        { ehcu, ".*", {git, "git@host:user/ehcu.git", {tag, "0.1.0"}}}
+        { ehcu, ".*", {git, "git@host:user/ehcu.git", {tag, "master"}}}
     ]}.
 
-Then just call your plugin directly in an existing application:
-
+Then just call below to get all command usages:
 
     $ rebar3 ehcu
     ===> Fetching ehcu
     ===> Compiling ehcu
-    <Plugin Output>
+    <Command Usage>

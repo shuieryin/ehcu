@@ -1,4 +1,4 @@
--module(ehcu_common_test).
+-module(ehcu_build).
 
 -export([
     init/1,
@@ -8,8 +8,8 @@
 
 -include("ehcu.hrl").
 
--define(PROVIDER, cmt).
--define(DEPS, [app_discovery, ct]).
+-define(PROVIDER, build).
+-define(DEPS, [app_discovery, release, dialyzer]).
 
 %% ===================================================================
 %% Public API
@@ -21,33 +21,19 @@ init(State) ->
         {module, ?MODULE},            % The module implementation of the task
         {bare, true},                 % The task can be run by the user, always true
         {deps, ?DEPS},                % The list of dependencies
-        {example, "rebar3 cmt"}, % How to use the plugin
-        {hooks, {[cover], []}}, % execute rebar command afterwards
+        {example, "rebar3 build"}, % How to use the plugin
+        {hooks, {[ck], []}}, % execute rebar command afterwards
         {opts, []},
-        {short_desc, "run common test and clean up"},
-        {desc, "run common test and clean up"}
+        {short_desc, "call release, diaylzyer, and common test"},
+        {desc, "Call release, diaylzyer, and common test"}
     ]),
     {ok, rebar_state:add_provider(State, Provider)}.
 
-
 -spec do(rebar_state:t()) -> {ok, rebar_state:t()} | {error, string()}.
 do(State) ->
-    #ehcu_state{
-        rebar_config = RebarConfig,
-        plugin_path = PluginPath
-    } = ehcu:ehcu_state(State),
-
-    case lists:keyfind(cover_enabled, 1, RebarConfig) of
-        {cover_enabled, true} ->
-            RawAnalysis = os:cmd(filename:append(PluginPath, "/priv/test_coverage.sh")),
-            Analysis = re:replace(RawAnalysis, "\n", "~n", [global, {return, list}]),
-            io:format(Analysis);
-        _CoverDisabled ->
-            io:format("===> Please define \"{cover_enabled, true}\" in rebar.config~n")
-    end,
-
-    io:format("===> Common test done.~n"),
-
+    io:format("===> Running common test, please wait...~n"),
+    io:format(os:cmd("./config/rebar3 do ct -c, cover -v")),
+    io:format("===> Build done.~n"),
     {ok, State}.
 
 -spec format_error(any()) -> iolist().
