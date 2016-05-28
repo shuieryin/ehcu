@@ -19,5 +19,6 @@
     src_config :: tuple(),
     src_file_path :: file:filename(),
     rebar_config_path :: file:filename(),
-    rebar_config :: [tuple()]
+    rebar_config :: [tuple()],
+    project_out_dir :: file:filename()
 }).
