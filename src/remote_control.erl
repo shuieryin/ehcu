@@ -3,7 +3,7 @@
 %%% @copyright (C) 2016, Shuieryin
 %%% @doc
 %%%
-%%% Remote controlling app server
+%%% Remote controlling app server trigger build
 %%%
 %%% @end
 %%% Created : 19. Feb 2016 3:56 PM
