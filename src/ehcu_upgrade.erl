@@ -3,11 +3,13 @@
 -export([
     init/1,
     do/1,
-    format_error/1
+    format_error/1,
+    test/0
 ]).
 
 -include("ehcu.hrl").
 
+-define(VERSION_DEPTH, -1).
 -define(PROVIDER, hcu).
 -define(DEPS, [app_discovery]).
 
@@ -74,7 +76,7 @@ appup(#ehcu_state{
     project_path = ProjectPath,
     project_out_dir = ProjectOutDir
 } = EhcuState) ->
-    NewVsn = increase_vsn(OldVsn, -1, 1), %% will not modify version number in rebar.config and [app_name].app.src
+    NewVsn = increase_vsn(OldVsn, ?VERSION_DEPTH, 1), %% will not modify version number in rebar.config and [app_name].app.src
 
     %% -------------------------get existing instructions - start-------------------------
     OldAppupPath = filename:join([ProjectPath, "ebin/", AppName ++ ".appup"]),
@@ -413,3 +415,6 @@ proplist_to_map(ElemPos, [Value | Tail], AccMap) ->
     proplist_to_map(ElemPos, Tail, AccMap#{Key => Value});
 proplist_to_map(_, [], AccMap) ->
     AccMap.
+
+test() ->
+    increase_vsn("0.1", 2, 1).

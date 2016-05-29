@@ -141,13 +141,13 @@ cmd(CmdStr) ->
 %%
 %% @end
 %%--------------------------------------------------------------------
--spec cmd_receive(node()) -> ok.
-cmd_receive(OutputNode) ->
+-spec cmd_receive(port()) -> ok.
+cmd_receive(OutputPort) ->
     receive
-        {OutputNode, {data, {_LineType, OutputBin}}} ->
+        {OutputPort, {data, {_LineType, OutputBin}}} ->
             io:format(<<"~n", OutputBin/binary>>),
-            cmd_receive(OutputNode);
-        {OutputNode, {exit_status, ExitStatus}} ->
+            cmd_receive(OutputPort);
+        {OutputPort, {exit_status, ExitStatus}} ->
             case ExitStatus of
                 0 ->
                     io:format("\e[0m~n");
