@@ -34,8 +34,6 @@ do(State) ->
     #ehcu_state{
         app_name = AppName,
         app_vsn = OldVsn
-%%        plugin_path = PluginPath,
-%%        project_path = ProjectPath
     } = EhcuState = ehcu:ehcu_state(State),
 
     case appup(EhcuState) of
@@ -62,7 +60,6 @@ do(State) ->
 
             ehcu:cmd("./_build/default/rel/" ++ AppName ++ "/bin/" ++ AppName ++ " install " ++ NewVsn)
     end,
-
 
     {ok, State}.
 
@@ -169,7 +166,7 @@ gen_appup(#ehcu_state{
             end, Instructions, ServerPrivDependencies),
 
     PluginOutDir = filename:join([PluginPath, "ebin"]),
-    ModuleSequnceCommand = "erl -noshell +pc unicode -name module_sequence@127.0.0.1 -setcookie " ++ AppName ++ " -s module_sequence exec " ++ AppName ++ "@127.0.0.1 -s init stop -pa " ++ PluginOutDir,
+    ModuleSequnceCommand = "erl -noshell +pc unicode -name module_sequence@127.0.0.1 -setcookie " ++ AppName ++ " -s remote_control module_sequence " ++ AppName ++ "@127.0.0.1 -s init stop -pa " ++ PluginOutDir,
 
     ModuleSequnce = str_to_term(os:cmd(ModuleSequnceCommand)),
     if
