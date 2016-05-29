@@ -144,9 +144,14 @@ cmd(CmdStr) ->
 -spec cmd_receive(node()) -> ok.
 cmd_receive(OutputNode) ->
     receive
-        {OutputNode, {data, {eol, OutputBin}}} ->
+        {OutputNode, {data, {_LineType, OutputBin}}} ->
             io:format(<<"~n", OutputBin/binary>>),
             cmd_receive(OutputNode);
-        {OutputNode, {exit_status, 0}} ->
-            io:format("~n")
+        {OutputNode, {exit_status, ExitStatus}} ->
+            case ExitStatus of
+                0 ->
+                    io:format("\e[0m~n");
+                _Else ->
+                    throw(cmd_error)
+            end
     end.

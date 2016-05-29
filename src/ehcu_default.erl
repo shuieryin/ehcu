@@ -47,6 +47,7 @@ do(State) ->
                     end
             end
         end, rebar_state:providers(State)),
+    file:write_file("rebar_state", io_lib:format("~tp.", [State])),
 
     {ok, State}.
 

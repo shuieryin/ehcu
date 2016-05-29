@@ -41,7 +41,7 @@ do(State) ->
 
     OverviewEdocPath = filename:append(ProjectPath, "/config/overview.edoc"),
 
-    case filelib:is_file(OverviewEdocPath) of
+    case filelib:is_regular(OverviewEdocPath) of
         true ->
             os:cmd(filename:append(PluginPath, "/priv/gen_edoc.sh " ++ AppName ++ " " ++ Vsn)),
             io:format("===> Edoc overview generated successfully~n");

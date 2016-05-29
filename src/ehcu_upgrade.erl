@@ -45,23 +45,22 @@ do(State) ->
             %% copy, remove, and move the src folder is because the modifications which got synchronized
             %% from intellij does not work for release upgrade and the cause remains unknown, this is to
             %% workaround the issue since no other solution is found.
-            os:cmd("cp -rf src src_bak ;\
-                    rm -rf src ;\
+            os:cmd("cp -rf src src_bak ;
+                    rm -rf src ;
                     mv src_bak src"),
 
             %% execute release upgrade command, version number after "-u" is the upgrade-from version.
-            ehcu:cmd("rebar3 release relup -u " ++ OldVsn ++ " tar"),
+            ehcu:cmd("./config/rebar3 release relup -u " ++ OldVsn ++ " tar"),
 
             %% copy [APP_NAME].rel from the latest release folder to parent releases folder because rebar3
             %% only perform this action once which will cause the auto release upgrade only works for two
             %% time, there we do this manually here.
-
-            ehcu:cmd("rm -f _build/default/rel/" ++ AppName ++ "/releases/" ++ AppName ++ ".rel ;\
-                        cp _build/default/rel/" ++ AppName ++ "/releases/" ++ NewVsn ++ "/" ++ AppName ++ ".rel _build/default/rel/" ++ AppName ++ "/releases/"),
-
             %% rebar3 does not put the release upgrade gzip package under the latest release version folder so do it manually.
-            ehcu:cmd("mv _build/default/rel/" ++ AppName ++ "/" ++ AppName ++ "-" ++ NewVsn ++ ".tar.gz _build/default/rel/" ++ AppName ++ "/releases/" ++ NewVsn ++ "/" ++ AppName ++ ".tar.gz ;\
-                        ./_build/default/rel/" ++ AppName ++ "/bin/" ++ AppName ++ " install " ++ NewVsn)
+            os:cmd("rm -f _build/default/rel/" ++ AppName ++ "/releases/" ++ AppName ++ ".rel ;
+                        cp _build/default/rel/" ++ AppName ++ "/releases/" ++ NewVsn ++ "/" ++ AppName ++ ".rel _build/default/rel/" ++ AppName ++ "/releases/ ;
+                        mv _build/default/rel/" ++ AppName ++ "/" ++ AppName ++ "-" ++ NewVsn ++ ".tar.gz _build/default/rel/" ++ AppName ++ "/releases/" ++ NewVsn ++ "/" ++ AppName ++ ".tar.gz"),
+
+            ehcu:cmd("./_build/default/rel/" ++ AppName ++ "/bin/" ++ AppName ++ " install " ++ NewVsn)
     end,
 
 
@@ -81,7 +80,7 @@ appup(#ehcu_state{
     NewVsn = increase_vsn(OldVsn, -1, 1), %% will not modify version number in rebar.config and [app_name].app.src
 
     %% -------------------------get existing instructions - start-------------------------
-    OldAppupPath = filename:join([ProjectPath, "ebin/", AppName, ".appup"]),
+    OldAppupPath = filename:join([ProjectPath, "ebin/", AppName ++ ".appup"]),
     ExistingInstructions =
         case file:consult(OldAppupPath) of
             {ok, [{OldVsn, [{_, SrcInstructions}], [{_, []}]}]} ->
@@ -129,9 +128,21 @@ appup(#ehcu_state{
 gen_appup(#ehcu_state{
     app_name = AppName,
     app_vsn = OldVsn,
-    plugin_path = PluginPath
+    plugin_path = PluginPath,
+    project_path = ProjectPath
 } = EhcuState, NewVsn, OldAppupPath, Instructions) ->
-    {ok, HcuConfigs} = file:consult("./config/hcu.config"),
+    HcuConfigName = "hcu.config",
+    ProjectConfigPath = filename:join([ProjectPath, "config"]),
+    HcuConfigPath = filename:join([ProjectConfigPath, HcuConfigName]),
+    case filelib:is_regular(HcuConfigPath) of
+        true ->
+            do_nothing;
+        false ->
+            io:format("===> config/hcu.config not found, create config from sample~n"),
+            os:cmd("mkdir -p " ++ ProjectConfigPath ++ ";
+                    cp " ++ filename:join([PluginPath, "priv", HcuConfigName]) ++ " " ++ HcuConfigPath)
+    end,
+    {ok, HcuConfigs} = file:consult(HcuConfigPath),
     {server_priv_dependency, ServerPrivDependencies} = lists:keyfind(server_priv_dependency, 1, HcuConfigs),
     UpdatedInstructions =
         lists:foldl(
@@ -281,7 +292,7 @@ generate_instruction_for_priv(OldVsn, NewVsn, FileType, BeamFolder, AccInstructi
             case lists:keyfind(CurModName, 2, AccModifiedInstructions) of
                 false ->
                     BeamFilePath = filename:join(BeamFolder, CurModNameStr ++ ".beam"),
-                    case filelib:is_file(BeamFilePath) of
+                    case filelib:is_regular(BeamFilePath) of
                         true ->
                             NewExtra =
                                 case FileType of
