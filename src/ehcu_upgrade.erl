@@ -168,12 +168,12 @@ gen_appup(#ehcu_state{
             end, Instructions, ServerPrivDependencies),
 
     PluginOutDir = filename:join([PluginPath, "ebin"]),
-    ModuleSequnceCommand = "erl -noshell +pc unicode -name module_sequence@127.0.0.1 -setcookie " ++ AppName ++ " -s remote_control module_sequence " ++ AppName ++ "@127.0.0.1 -s init stop -pa " ++ PluginOutDir,
+    ModuleSequenceCommand = "erl -noshell +pc unicode -name module_sequence@127.0.0.1 -setcookie " ++ AppName ++ " -s remote_control module_sequence " ++ AppName ++ "@" ++ AppName ++ ".local -s init stop -pa " ++ PluginOutDir,
 
-    ModuleSequnce = str_to_term(os:cmd(ModuleSequnceCommand)),
+    ModuleSequence = str_to_term(os:cmd(ModuleSequenceCommand)),
     if
-        ModuleSequnce == connection_failed ->
-            ErrMsg = "===> Cannot get module sequences, " ++ atom_to_list(ModuleSequnce) ++ "~n",
+        ModuleSequence == connection_failed ->
+            ErrMsg = "===> Cannot get module sequences, " ++ atom_to_list(ModuleSequence) ++ "~n",
             io:format(ErrMsg),
             throw(ErrMsg);
         true ->
@@ -188,7 +188,7 @@ gen_appup(#ehcu_state{
                 },
                 Counter + 1
             }
-        end, {#{}, 1}, ModuleSequnce),
+        end, {#{}, 1}, ModuleSequence),
 
     FinalInstructions = lists:sort(
         fun(A, B) ->
