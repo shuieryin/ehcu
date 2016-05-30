@@ -31,7 +31,7 @@ Then just call below to get all command usages:
 Module sequence method on your app server
 -----------------------------------------
 
-Implement below method on you app server globally for ehcu plugin to generate app sequence for you.
+Implement below method on your app server globally for ehcu plugin to generate app sequence for you.
 
 ```erlang
 -spec gen_sequence(module()) -> [module()].
