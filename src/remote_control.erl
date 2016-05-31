@@ -54,11 +54,28 @@ stop_server([NodeAddr]) ->
 %%--------------------------------------------------------------------
 -spec exec(node(), module(), atom()) -> ok.
 exec(NodeAddr, ModuleName, CallMethod) ->
-    case net_kernel:connect_node(NodeAddr) of
+    case connect_node(NodeAddr) of
         true ->
             timer:sleep(250),
             ChildrenSpecs = gen_server:CallMethod({global, information_server}, ModuleName),
             io:format("~p.", [ChildrenSpecs]);
         _ ->
             io:format("connection_failed.")
+    end.
+
+%%--------------------------------------------------------------------
+%% @doc
+%% Connect node
+%%
+%% @end
+%%--------------------------------------------------------------------
+-spec connect_node(node()) -> boolean().
+connect_node(NodeAddr) ->
+    case lists:member(NodeAddr, erlang:nodes()) of
+        true ->
+            true;
+        false ->
+            Result = net_kernel:connect_node(NodeAddr),
+            timer:sleep(250),
+            Result
     end.
