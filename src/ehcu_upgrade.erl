@@ -168,9 +168,14 @@ gen_appup(#ehcu_state{
             end, Instructions, ServerPrivDependencies),
 
     PluginOutDir = filename:join([PluginPath, "ebin"]),
-    ModuleSequenceCommand = "erl -noshell +pc unicode -name module_sequence@127.0.0.1 -setcookie " ++ AppName ++ " -s remote_control module_sequence " ++ AppName ++ "@" ++ AppName ++ ".local -s init stop -pa " ++ PluginOutDir,
 
-    ModuleSequence = str_to_term(os:cmd(ModuleSequenceCommand)),
+    CookieName = re:replace(os:cmd("cat ./config/vm.args | grep \"^\-setcookie\" | awk '{print $2}' | tr -d \" \""), "\n", "", [{return, list}]),
+    NodeName = re:replace(os:cmd("cat ./config/vm.args | grep \"^\-name\" | awk '{print $2}' | tr -d \" \""), "\n", "", [{return, list}]),
+
+    ModuleSequenceCommand = "erl -noshell +pc unicode -name module_sequence@module_sequence.local -setcookie " ++ CookieName ++ " -s remote_control module_sequence " ++ NodeName ++ " -s init stop -pa " ++ PluginOutDir,
+
+    CommandResult = os:cmd(ModuleSequenceCommand),
+    ModuleSequence = str_to_term(CommandResult),
     if
         ModuleSequence == connection_failed ->
             ErrMsg = "===> Cannot get module sequences, " ++ atom_to_list(ModuleSequence) ++ "~n",
