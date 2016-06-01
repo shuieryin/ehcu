@@ -33,12 +33,13 @@ init(State) ->
 -spec do(rebar_state:t()) -> {ok, rebar_state:t()} | {error, string()}.
 do(State) ->
     #ehcu_state{
-        app_name = AppName,
-        plugin_path = PluginPath
+        plugin_path = PluginPath,
+        cookie_name = CookieName,
+        node_name = NodeName
     } = ehcu:ehcu_state(State),
 
     PluginOutDir = filename:join([PluginPath, "ebin"]),
-    os:cmd("erl -noshell +pc unicode -name stop_server@127.0.0.1 -setcookie " ++ AppName ++ " -s remote_control stop_server " ++ AppName ++ "@127.0.0.1 -s init stop -pa " ++ PluginOutDir),
+    os:cmd("erl -noshell +pc unicode -name stop_server@stop_server.local -setcookie " ++ CookieName ++ " -s remote_control stop_server " ++ NodeName ++ " -s init stop -pa " ++ PluginOutDir),
     io:format("===> Application server should has been stopped.~n"),
 
     {ok, State}.

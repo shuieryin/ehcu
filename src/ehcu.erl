@@ -64,6 +64,9 @@ ehcu_state(State) ->
 
     AppInfo = lists:keyfind(atom_to_binary(RawAppName, utf8), 2, rebar_state:project_apps(State)),
 
+    CookieName = re:replace(os:cmd("cat ./config/vm.args | grep \"^\-setcookie\" | awk '{print $2}' | tr -d \" \""), "\n", "", [{return, list}]),
+    NodeName = re:replace(os:cmd("cat ./config/vm.args | grep \"^\-name\" | awk '{print $2}' | tr -d \" \""), "\n", "", [{return, list}]),
+
     #ehcu_state{
         app_name = atom_to_list(RawAppName),
         app_vsn = Vsn,
@@ -73,7 +76,9 @@ ehcu_state(State) ->
         src_file_path = SrcFilePath,
         rebar_config_path = RebarConfigPath,
         rebar_config = RebarConfig,
-        project_out_dir = rebar_app_info:out_dir(AppInfo)
+        project_out_dir = rebar_app_info:out_dir(AppInfo),
+        cookie_name = CookieName,
+        node_name = NodeName
     }.
 
 %%--------------------------------------------------------------------

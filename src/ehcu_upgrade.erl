@@ -128,7 +128,9 @@ gen_appup(#ehcu_state{
     app_name = AppName,
     app_vsn = OldVsn,
     plugin_path = PluginPath,
-    project_path = ProjectPath
+    project_path = ProjectPath,
+    cookie_name = CookieName,
+    node_name = NodeName
 } = EhcuState, NewVsn, OldAppupPath, Instructions) ->
     HcuConfigName = "hcu.config",
     ProjectConfigPath = filename:join([ProjectPath, "config"]),
@@ -168,9 +170,6 @@ gen_appup(#ehcu_state{
             end, Instructions, ServerPrivDependencies),
 
     PluginOutDir = filename:join([PluginPath, "ebin"]),
-
-    CookieName = re:replace(os:cmd("cat ./config/vm.args | grep \"^\-setcookie\" | awk '{print $2}' | tr -d \" \""), "\n", "", [{return, list}]),
-    NodeName = re:replace(os:cmd("cat ./config/vm.args | grep \"^\-name\" | awk '{print $2}' | tr -d \" \""), "\n", "", [{return, list}]),
 
     ModuleSequenceCommand = "erl -noshell +pc unicode -name module_sequence@module_sequence.local -setcookie " ++ CookieName ++ " -s remote_control module_sequence " ++ NodeName ++ " -s init stop -pa " ++ PluginOutDir,
 

@@ -20,5 +20,7 @@
     src_file_path :: file:filename(),
     rebar_config_path :: file:filename(),
     rebar_config :: [tuple()],
-    project_out_dir :: file:filename()
+    project_out_dir :: file:filename(),
+    cookie_name :: string(),
+    node_name :: string()
 }).
