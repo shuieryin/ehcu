@@ -39,7 +39,7 @@
 
 -record(state, {
     root_sup_name :: module(),
-    stop_server_func = {init, stop, []} :: stop_server_method()
+    stop_server_method = {init, stop, []} :: stop_server_method()
 }).
 
 -export_type([
@@ -124,15 +124,21 @@ stop() ->
     Args :: term(),
     State :: #state{},
     Reason :: term(). % generic term
-init([]) ->
+init(StopServerMethod) ->
     io:format("~p starting...", [?MODULE]),
 
-    RootSupName = list_to_atom(atom_to_list(elib:app_name()) ++ "_sup"),
+    AppNameStr = begin
+                     [ProjectPath | _RestPath] = re:split(filename:absname(""), "_build", [{return, list}]),
+                     filename:basename(ProjectPath)
+                 end,
+
+    RootSupName = list_to_atom(AppNameStr ++ "_sup"),
 
     io:format("started~n"),
 
     {ok, #state{
-        root_sup_name = RootSupName
+        root_sup_name = RootSupName,
+        stop_server_method = StopServerMethod
     }}.
 
 %%--------------------------------------------------------------------
@@ -187,7 +193,7 @@ handle_call(module_sequence, _From, #state{
 handle_cast(stop, State) ->
     {stop, normal, State};
 handle_cast(stop_server, #state{
-    stop_server_func = {Mod, Func, Args}
+    stop_server_method = {Mod, Func, Args}
 } = State) ->
     erlang:apply(Mod, Func, Args),
     {noreply, State}.
