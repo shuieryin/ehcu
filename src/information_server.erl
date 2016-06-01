@@ -17,6 +17,8 @@
 -export([
     start_link/1,
     start/1,
+    start_link/0,
+    start/0,
     stop/0,
     module_sequence/0,
     stop_server/0
@@ -89,6 +91,26 @@ start_link(StopServerMethod) ->
 -spec start(stop_server_method()) -> gen:start_ret().
 start(StopServerMethod) ->
     gen_server:start({global, ?SERVER}, ?MODULE, StopServerMethod, []).
+
+%%--------------------------------------------------------------------
+%% @doc
+%% Starts the server
+%%
+%% @end
+%%--------------------------------------------------------------------
+-spec start_link() -> gen:start_ret().
+start_link() ->
+    start_link({init, stop, []}).
+
+%%--------------------------------------------------------------------
+%% @doc
+%% Starts server by setting module name as server name without link.
+%%
+%% @end
+%%--------------------------------------------------------------------
+-spec start() -> gen:start_ret().
+start() ->
+    start({init, stop, []}).
 
 %%--------------------------------------------------------------------
 %% @doc
