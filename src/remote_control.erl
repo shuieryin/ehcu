@@ -58,7 +58,7 @@ exec(NodeAddr, ModuleName, CallMethod) ->
         true ->
             NodeAddStr = atom_to_list(NodeAddr),
             [AppNameStr | _Rest] = string:tokens(NodeAddStr, "@"),
-            InfoServerName = list_to_atom(AppNameStr ++ "information_server"),
+            InfoServerName = list_to_atom(AppNameStr ++ "_information_server"),
             timer:sleep(250),
             ChildrenSpecs = gen_server:CallMethod({global, InfoServerName}, ModuleName),
             io:format("~p.", [ChildrenSpecs]);
