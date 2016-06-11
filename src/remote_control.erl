@@ -56,7 +56,7 @@ stop_server([NodeAddr]) ->
 exec(NodeAddr, ModuleName, CallMethod) ->
     case net_kernel:connect_node(NodeAddr) of
         true ->
-            NodeAddStr = atom_to_list(NodeAddStr),
+            NodeAddStr = atom_to_list(NodeAddr),
             [AppNameStr | _Rest] = string:tokens(NodeAddStr, "@"),
             InfoServerName = list_to_atom(AppNameStr ++ "information_server"),
             timer:sleep(250),
