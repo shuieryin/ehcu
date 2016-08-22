@@ -397,7 +397,14 @@ ukeymerge(ElemPos, SrcList, MergeList) ->
     FinalMap = proplist_to_map(ElemPos, SrcList, MergeMap),
     maps:values(FinalMap).
 
-str_to_term(SrcStr) ->
+str_to_term(RawSrcStr) ->
+    SrcStr = case string:right(RawSrcStr, 1) == "." of
+                 true ->
+                     RawSrcStr;
+                 false ->
+                     lists:reverse("." ++ lists:reverse(RawSrcStr))
+             end,
+
     {ok, Tokens, _EndLocation} = erl_scan:string(SrcStr),
     {ok, Term} = erl_parse:parse_term(Tokens),
     Term.
