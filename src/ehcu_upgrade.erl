@@ -171,7 +171,7 @@ gen_appup(#ehcu_state{
 
     PluginOutDir = filename:join([PluginPath, "ebin"]),
 
-    ModuleSequenceCommand = "erl -noshell +pc unicode -name module_sequence@" ++ AppName ++ ".local -setcookie " ++ CookieName ++ " -s remote_control module_sequence " ++ NodeName ++ " -s init stop -pa " ++ PluginOutDir,
+    ModuleSequenceCommand = "erl -noshell +pc unicode -name module_sequence@" ++ re:replace(AppName, "_", "", [global, {return, list}]) ++ ".local -setcookie " ++ CookieName ++ " -s remote_control module_sequence " ++ NodeName ++ " -s init stop -pa " ++ PluginOutDir,
 
     CommandResult = os:cmd(ModuleSequenceCommand),
     ModuleSequence = str_to_term(CommandResult),
