@@ -173,7 +173,7 @@ gen_appup(#ehcu_state{
 
     ModuleSequenceCommand = "erl -noshell +pc unicode -name module_sequence@modulesequence.local -setcookie " ++ CookieName ++ " -s remote_control module_sequence " ++ NodeName ++ " -s init stop -pa " ++ PluginOutDir,
 
-    [CommandResult | _EmptyOrError] = re:split(os:cmd(ModuleSequenceCommand), ".", [{return, list}]),
+    [CommandResult | _EmptyOrError] = re:split(os:cmd(ModuleSequenceCommand), "\\.", [{return, list}]),
     ModuleSequence = str_to_term(CommandResult),
     if
         ModuleSequence == connection_failed ->
