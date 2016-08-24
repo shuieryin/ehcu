@@ -2,7 +2,7 @@ ehcu
 =====
 
 [![Build Status](https://travis-ci.org/shuieryin/ehcu.svg?branch=master)](https://travis-ci.org/shuieryin/ehcu)
-[![Code Climate](http://img.shields.io/badge/code_climate-Erlang_18.3-brightgreen.svg)](http://www.erlang.org/downloads/18.3)
+[![Code Climate](http://img.shields.io/badge/code_climate-Erlang_19.0-brightgreen.svg)](http://www.erlang.org/downloads/19.0)
 
 Hot code upgrade plugin for my convenience
 
