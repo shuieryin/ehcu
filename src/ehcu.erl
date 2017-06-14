@@ -134,6 +134,7 @@ format_os_ouput(RawOutput) ->
 %%--------------------------------------------------------------------
 -spec cmd(string()) -> ok.
 cmd(CmdStr) ->
+    error_logger:info_msg("CmdStr:~p~n", [CmdStr]),
     OutputNode = erlang:open_port({spawn, CmdStr},
         [stderr_to_stdout, in, exit_status,
             binary, stream, {line, 255}]),
@@ -157,6 +158,6 @@ cmd_receive(OutputPort) ->
                 0 ->
                     io:format("\e[0m~n");
                 _Else ->
-                    throw(cmd_error)
+                    io:format("cmd_error")
             end
     end.
