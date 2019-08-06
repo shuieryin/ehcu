@@ -34,12 +34,20 @@ do(State) ->
     #ehcu_state{
         app_name = AppName
     } = ehcu:ehcu_state(State),
+    file:del_dir("_build/default/lib/" ++ AppName ++ "/"),
+    file:del_dir("_build/default/rel/" ++ AppName ++ "/"),
+    file:delete("ebin/" ++ AppName ++ ".appup"),
 
-    os:cmd("rm -rf _build/default/lib/" ++ AppName ++ "/ ;\
-            rm -rf _build/default/rel/" ++ AppName ++ "/ ;\
-            rm -f ebin/" ++ AppName ++ ".appup"),
+    Os = erlang:system_info(os_type),
+    ExeStr =
+        case Os of
+            win32 ->
+                ".\config\rebar3 release";
+            _RestOses ->
+                "./config/rebar3 release"
+        end,
 
-    ehcu:cmd("./config/rebar3 release"),
+    ehcu:cmd(ExeStr),
 
     {ok, State}.
 
