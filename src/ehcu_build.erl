@@ -38,11 +38,11 @@ do(State) ->
     file:del_dir("_build/default/rel/" ++ AppName ++ "/"),
     file:delete("ebin/" ++ AppName ++ ".appup"),
 
-    Os = erlang:system_info(os_type),
+    {Os, _OsVer} = erlang:system_info(os_type),
     ExeStr =
         case Os of
             win32 ->
-                ".\config\rebar3 release";
+                "cmd /C .\config\rebar3 release";
             _RestOses ->
                 "./config/rebar3 release"
         end,
